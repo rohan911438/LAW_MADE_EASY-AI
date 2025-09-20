@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Clock, ExternalLink, Tag, Building2, AlertCircle } from "lucide-react";
 import { LegalNewsItem } from "@/services/legalNewsAPI";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface NewsDetailsModalProps {
   news: LegalNewsItem | null;
@@ -101,93 +102,117 @@ export const NewsDetailsModal = ({ news, isOpen, onClose }: NewsDetailsModalProp
 
             <Separator className="my-6" />
 
-            {/* News Image */}
-            {news.imageUrl && (
-              <div className="mb-6">
-                <div className="w-full h-64 bg-gray-100 rounded-lg overflow-hidden">
-                  <img 
-                    src={news.imageUrl} 
-                    alt={news.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/placeholder.svg';
-                    }}
-                  />
+            <Tabs defaultValue="summary" className="w-full">
+              <TabsList>
+                <TabsTrigger value="summary">Summary</TabsTrigger>
+                <TabsTrigger value="original" disabled={!news.url}>Original Page</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="summary">
+                {/* News Image */}
+                <div className="mb-6">
+                  <div className="w-full h-64 bg-gray-100 rounded-lg overflow-hidden">
+                    <img 
+                      src={news.imageUrl || '/placeholder.svg'} 
+                      alt={news.title}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                      crossOrigin="anonymous"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target.src.includes('placeholder.svg')) return;
+                        target.src = '/placeholder.svg';
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {/* Content */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Full Article</h3>
-              <div className="prose prose-gray max-w-none">
-                <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                  {news.content}
-                </p>
-              </div>
-            </div>
+                {/* Content */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Full Article</h3>
+                  <div className="prose prose-gray max-w-none">
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                      {news.content}
+                    </p>
+                  </div>
+                </div>
 
-            {/* Tags */}
-            {news.tags.length > 0 && (
-              <>
+                {/* Tags */}
+                {news.tags.length > 0 && (
+                  <>
+                    <Separator className="my-6" />
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-muted-foreground" />
+                        <h3 className="text-sm font-semibold">Related Topics</h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {news.tags.map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Action Buttons */}
                 <Separator className="my-6" />
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Tag className="h-4 w-4 text-muted-foreground" />
-                    <h3 className="text-sm font-semibold">Related Topics</h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {news.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Action Buttons */}
-            <Separator className="my-6" />
-            <div className="flex gap-3">
-              {news.url && (
-                <Button asChild className="flex items-center gap-2">
-                  <a 
-                    href={news.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    View Original Source
-                  </a>
-                </Button>
-              )}
-              
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  const shareData = {
-                    title: news.title,
-                    text: news.description,
-                    url: news.url || window.location.href
-                  };
+                <div className="flex gap-3">
+                  {news.url && (
+                    <Button asChild className="flex items-center gap-2">
+                      <a 
+                        href={news.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        View Original Source
+                      </a>
+                    </Button>
+                  )}
                   
-                  if (navigator.share && navigator.canShare?.(shareData)) {
-                    navigator.share(shareData);
-                  } else {
-                    // Fallback to copying to clipboard
-                    const shareText = `${news.title}\n\n${news.description}\n\n${news.url || window.location.href}`;
-                    navigator.clipboard?.writeText(shareText).then(() => {
-                      // Could add toast notification here
-                      console.log('Copied to clipboard');
-                    });
-                  }
-                }}
-              >
-                Share Article
-              </Button>
-            </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      const shareData = {
+                        title: news.title,
+                        text: news.description,
+                        url: news.url || window.location.href
+                      };
+                      
+                      if (navigator.share && navigator.canShare?.(shareData)) {
+                        navigator.share(shareData);
+                      } else {
+                        const shareText = `${news.title}\n\n${news.description}\n\n${news.url || window.location.href}`;
+                        navigator.clipboard?.writeText(shareText).then(() => {
+                          console.log('Copied to clipboard');
+                        });
+                      }
+                    }}
+                  >
+                    Share Article
+                  </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="original">
+                {!news.url ? (
+                  <div className="p-6 text-sm text-muted-foreground">No original URL provided.</div>
+                ) : (
+                  <div className="h-[70vh] border rounded-md overflow-hidden">
+                    <iframe
+                      src={news.url}
+                      title={`Original article - ${news.title}`}
+                      className="w-full h-full"
+                      sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    />
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
 
             {/* Legal Disclaimer */}
             <div className="mt-6 p-4 bg-muted/50 rounded-lg">

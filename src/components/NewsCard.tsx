@@ -71,19 +71,20 @@ export const NewsCard = ({ news, onReadMore }: NewsCardProps) => {
       <CardContent className="pt-0">
         <div className="space-y-4">
           {/* News Image */}
-          {news.imageUrl && (
-            <div className="w-full h-32 bg-gray-100 rounded-md overflow-hidden">
-              <img 
-                src={news.imageUrl} 
-                alt={news.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder.svg';
-                }}
-              />
-            </div>
-          )}
+          <div className="w-full h-32 bg-gray-100 rounded-md overflow-hidden">
+            <img 
+              src={news.imageUrl || '/placeholder.svg'} 
+              alt={news.title}
+              className="w-full h-full object-cover"
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (target.src.includes('placeholder.svg')) return;
+                target.src = '/placeholder.svg';
+              }}
+            />
+          </div>
 
           {/* News Meta Information */}
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
