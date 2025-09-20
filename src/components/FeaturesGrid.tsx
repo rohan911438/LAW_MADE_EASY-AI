@@ -290,10 +290,12 @@ export const FeaturesGrid = () => {
                       </Button>
                     </Link>
                   ) : (
-                    <Button variant="outline">
-                      Learn More
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
+                    <Link to="/legal-social-feed" className="flex-1">
+                      <Button variant="outline" className="w-full">
+                        Learn More
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
                   )}
                 </div>
               </div>

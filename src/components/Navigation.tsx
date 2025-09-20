@@ -42,6 +42,12 @@ export const Navigation = () => {
     },
     {
       icon: Users,
+      title: "Legal Social Feed",
+      description: "Connect with professionals",
+      href: "/legal-social-feed"
+    },
+    {
+      icon: Users,
       title: "Legal Community",
       description: "Connect with professionals",
       href: "#features"
