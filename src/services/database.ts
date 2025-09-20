@@ -53,7 +53,7 @@ export interface UsageTracking {
   id: string;
   user_id: string;
   document_processing_id?: string;
-  action_type: 'document_upload' | 'text_processing' | 'result_download' | 'api_call';
+  action_type: 'document_upload' | 'text_processing' | 'result_download' | 'api_call' | 'document_authenticity_check';
   api_endpoint?: string;
   processing_time?: number;
   tokens_used?: number;

@@ -3,7 +3,7 @@ import { DatabaseService, type UsageTracking } from './database';
 import { DocumentParser } from './documentParser';
 
 // Google AI API configuration
-const API_KEY = 'AIzaSyCtkrv2kJMUTJSQiNTTP1d-MlK1kltL_bY';
+const API_KEY = 'AIzaSyCrIbBqeGwwifLjvbfgNMfjo8Pigm5kE5A';
 const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 export interface DocumentAuthenticityRequest {
