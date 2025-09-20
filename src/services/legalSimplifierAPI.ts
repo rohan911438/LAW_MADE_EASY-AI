@@ -3,8 +3,8 @@ import { DatabaseService, type DocumentProcessing, type UsageTracking } from './
 import { DocumentParser } from './documentParser';
 
 // Google AI API configuration
-const API_KEY = 'AIzaSyCKTtDy6V-qPYL_JM1hjpLSAkao4R7doBk';
-const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const API_KEY = 'AIzaSyCtkrv2kJMUTJSQiNTTP1d-MlK1kltL_bY';
+const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 export interface SimplificationRequest {
   text: string;
@@ -107,23 +107,35 @@ SIMPLIFIED VERSION:`;
     try {
       const startTime = Date.now();
       
-      // Check if user is authenticated
-      const user = await DatabaseService.getCurrentUser();
-      const userId = user?.id;
+      // Check if user is authenticated (optional)
+      let user = null;
+      let userId = null;
       
-      // Track usage - document upload
+      try {
+        user = await DatabaseService.getCurrentUser();
+        userId = user?.id;
+      } catch (authError) {
+        console.log('User not authenticated, proceeding without user tracking');
+        // Continue without authentication - this is fine for demo purposes
+      }
+      
+      // Track usage - document upload (only if user is authenticated)
       if (userId) {
-        await DatabaseService.trackUsage({
-          user_id: userId,
-          action_type: 'text_processing',
-          api_endpoint: API_BASE_URL,
-          metadata: {
-            fileName,
-            fileSize,
-            wordCount: request.text.split(/\s+/).filter(w => w.length > 0).length,
-            documentType: request.documentType
-          }
-        });
+        try {
+          await DatabaseService.trackUsage({
+            user_id: userId,
+            action_type: 'text_processing',
+            api_endpoint: this.baseUrl,
+            metadata: {
+              fileName,
+              fileSize,
+              wordCount: request.text.split(/\s+/).filter(w => w.length > 0).length,
+              documentType: request.documentType
+            }
+          });
+        } catch (trackingError) {
+          console.log('Usage tracking failed, continuing without tracking');
+        }
       }
 
       // Update progress
@@ -153,9 +165,18 @@ SIMPLIFIED VERSION:`;
 
         const prompt = this.createSimplificationPrompt(chunk, request.documentType, isChunked);
         
+        console.log('Making API request to:', `${this.baseUrl}?key=${this.apiKey.substring(0, 10)}...`);
+        console.log('Request payload:', {
+          contents: [{
+            parts: [{
+              text: prompt.substring(0, 200) + '...'
+            }]
+          }]
+        });
+        
         try {
           const response = await axios.post(
-            `${API_BASE_URL}?key=${API_KEY}`,
+            `${this.baseUrl}?key=${this.apiKey}`,
             {
               contents: [{
                 parts: [{
@@ -195,11 +216,27 @@ SIMPLIFIED VERSION:`;
             }
           );
 
+          console.log('API Response status:', response.status);
+          console.log('API Response data:', JSON.stringify(response.data, null, 2));
+
           if (!response.data.candidates || response.data.candidates.length === 0) {
-            throw new Error(`No response from AI service for chunk ${i + 1}`);
+            console.error('No candidates in response:', response.data);
+            throw new Error(`No response from AI service for chunk ${i + 1}. Response: ${JSON.stringify(response.data)}`);
           }
 
-          const simplifiedChunk = response.data.candidates[0].content.parts[0].text;
+          const candidate = response.data.candidates[0];
+          if (!candidate.content || !candidate.content.parts || candidate.content.parts.length === 0) {
+            console.error('Invalid candidate structure:', candidate);
+            throw new Error(`Invalid response structure for chunk ${i + 1}. Candidate: ${JSON.stringify(candidate)}`);
+          }
+
+          const simplifiedChunk = candidate.content.parts[0].text;
+          if (!simplifiedChunk || simplifiedChunk.trim().length === 0) {
+            console.error('Empty response text:', simplifiedChunk);
+            throw new Error(`Empty response from AI service for chunk ${i + 1}`);
+          }
+
+          console.log('Successfully extracted text:', simplifiedChunk.substring(0, 100) + '...');
           allSimplifiedChunks.push(simplifiedChunk);
           
           // Small delay between chunks to avoid rate limiting
@@ -222,7 +259,7 @@ SIMPLIFIED VERSION:`;
             // Retry the chunk
             try {
               const retryResponse = await axios.post(
-                `${API_BASE_URL}?key=${API_KEY}`,
+                `${this.baseUrl}?key=${this.apiKey}`,
                 {
                   contents: [{
                     parts: [{
@@ -311,7 +348,7 @@ SIMPLIFIED VERSION:`;
             user_id: userId,
             document_processing_id: documentId,
             action_type: 'api_call',
-            api_endpoint: API_BASE_URL,
+            api_endpoint: this.baseUrl,
             processing_time: result.processingTime * 1000, // convert to milliseconds
             tokens_used: Math.ceil((request.text.length + result.simplifiedText.length) / 4), // approximate tokens
             cost_incurred: 149, // ₹149 per document
@@ -337,16 +374,35 @@ SIMPLIFIED VERSION:`;
       console.error('Legal simplification error:', error);
       
       if (axios.isAxiosError(error)) {
+        console.error('API Error Response:', error.response?.data);
+        console.error('API Error Status:', error.response?.status);
+        console.error('API Error Headers:', error.response?.headers);
+        
         if (error.response?.status === 429) {
-          throw new Error('Rate limit exceeded. Please try again in a few minutes.');
-        } else if (error.response?.status === 401) {
+          const errorMsg = error.response?.data?.error?.message || '';
+          if (errorMsg.includes('quota')) {
+            throw new Error('API quota exceeded. The free tier limits have been reached for this API key. Please wait or upgrade your Google AI API plan.');
+          } else {
+            throw new Error('Rate limit exceeded. Please try again in a few minutes.');
+          }
+        } else if (error.response?.status === 401 || error.response?.status === 403) {
           throw new Error('Invalid API key. Please check your configuration.');
         } else if (error.response?.status === 400) {
-          throw new Error('Invalid request. Please check your text content.');
+          const errorDetail = error.response?.data?.error?.message || 'Invalid request format';
+          throw new Error(`Bad request: ${errorDetail}`);
+        } else if (error.response?.status === 404) {
+          throw new Error('API endpoint not found. The model may not be available or the URL is incorrect.');
+        } else {
+          const errorDetail = error.response?.data?.error?.message || error.message || 'Unknown API error';
+          throw new Error(`API Error (${error.response?.status}): ${errorDetail}`);
         }
+      } else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+        throw new Error('Network error: Unable to connect to Google AI service. Please check your internet connection.');
+      } else {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        console.error('Non-API Error:', errorMessage);
+        throw new Error(`Processing failed: ${errorMessage}`);
       }
-      
-      throw new Error('Failed to simplify legal text. Please try again.');
     }
   }
 

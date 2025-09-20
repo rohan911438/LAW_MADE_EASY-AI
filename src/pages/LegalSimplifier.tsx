@@ -65,7 +65,7 @@ const LegalSimplifier: React.FC = () => {
       const currentUser = await DatabaseService.getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.log('No authenticated user - using demo mode');
       setUser(null);
     }
   };
@@ -75,7 +75,8 @@ const LegalSimplifier: React.FC = () => {
       const history = await getDocumentHistory(5);
       setDocumentHistory(history);
     } catch (error) {
-      console.error('Failed to load document history:', error);
+      console.log('No document history available - user not authenticated');
+      setDocumentHistory([]);
     }
   };
 
