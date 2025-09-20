@@ -103,15 +103,18 @@ export default {
         "gradient-primary": "var(--gradient-primary)",
         "gradient-hero": "var(--gradient-hero)",
         "gradient-card": "var(--gradient-card)",
+        "gradient-feature": "var(--gradient-feature)",
       },
       boxShadow: {
         "elegant": "var(--shadow-elegant)",
         "card": "var(--shadow-card)",
         "glow": "var(--shadow-glow)",
+        "soft": "var(--shadow-soft)",
       },
       transitionTimingFunction: {
         "smooth": "var(--transition-smooth)",
         "bounce": "var(--transition-bounce)",
+        "elastic": "var(--transition-elastic)",
       },
     },
   },
