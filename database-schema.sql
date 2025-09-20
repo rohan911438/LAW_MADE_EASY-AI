@@ -51,6 +51,33 @@ CREATE TABLE IF NOT EXISTS public.usage_tracking (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Create document_authenticity table
+CREATE TABLE IF NOT EXISTS public.document_authenticity (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+  document_id TEXT UNIQUE NOT NULL, -- Verification ID like AUTH-xyz-abc
+  file_name TEXT,
+  file_type TEXT,
+  file_size BIGINT,
+  authenticity_score INTEGER NOT NULL CHECK (authenticity_score >= 0 AND authenticity_score <= 100),
+  confidence_score INTEGER NOT NULL CHECK (confidence_score >= 0 AND confidence_score <= 100),
+  risk_level TEXT NOT NULL CHECK (risk_level IN ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL')),
+  is_authentic BOOLEAN NOT NULL,
+  fraud_risk_score INTEGER DEFAULT 0 CHECK (fraud_risk_score >= 0 AND fraud_risk_score <= 100),
+  fraud_indicators JSONB, -- Array of fraud indicators
+  compliance_status TEXT CHECK (compliance_status IN ('COMPLIANT', 'NON_COMPLIANT', 'PARTIAL_COMPLIANCE')),
+  missing_elements JSONB, -- Array of missing compliance elements
+  legal_requirements JSONB, -- Array of legal requirement checks
+  key_findings JSONB, -- Array of key findings
+  recommendations JSONB, -- Array of recommendations
+  document_metadata JSONB, -- Extracted parties, dates, amounts, structure
+  analysis_result JSONB, -- Complete analysis response
+  processing_time INTEGER, -- in milliseconds
+  verification_timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create billing_records table
 CREATE TABLE IF NOT EXISTS public.billing_records (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -71,6 +98,9 @@ CREATE TABLE IF NOT EXISTS public.billing_records (
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_document_processing_user_id ON public.document_processing(user_id);
 CREATE INDEX IF NOT EXISTS idx_document_processing_created_at ON public.document_processing(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_document_authenticity_user_id ON public.document_authenticity(user_id);
+CREATE INDEX IF NOT EXISTS idx_document_authenticity_document_id ON public.document_authenticity(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_authenticity_created_at ON public.document_authenticity(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_usage_tracking_user_id ON public.usage_tracking(user_id);
 CREATE INDEX IF NOT EXISTS idx_usage_tracking_created_at ON public.usage_tracking(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_billing_records_user_id ON public.billing_records(user_id);
@@ -87,11 +117,13 @@ $$ language 'plpgsql';
 -- Add updated_at triggers
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_document_processing_updated_at BEFORE UPDATE ON public.document_processing FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_document_authenticity_updated_at BEFORE UPDATE ON public.document_authenticity FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_billing_records_updated_at BEFORE UPDATE ON public.billing_records FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.document_processing ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.document_authenticity ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.usage_tracking ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.billing_records ENABLE ROW LEVEL SECURITY;
 
@@ -112,6 +144,16 @@ CREATE POLICY "Users can insert own documents" ON public.document_processing
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update own documents" ON public.document_processing
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Document authenticity policies
+CREATE POLICY "Users can view own authenticity records" ON public.document_authenticity
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own authenticity records" ON public.document_authenticity
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own authenticity records" ON public.document_authenticity
   FOR UPDATE USING (auth.uid() = user_id);
 
 -- Usage tracking policies

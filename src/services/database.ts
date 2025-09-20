@@ -78,6 +78,32 @@ export interface BillingRecord {
   updated_at: string;
 }
 
+export interface DocumentAuthenticity {
+  id: string;
+  user_id: string;
+  document_id: string; // Verification ID like AUTH-xyz-abc
+  file_name?: string;
+  file_type?: string;
+  file_size?: number;
+  authenticity_score: number; // 0-100
+  confidence_score: number; // 0-100
+  risk_level: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  is_authentic: boolean;
+  fraud_risk_score?: number; // 0-100
+  fraud_indicators?: any; // JSON array
+  compliance_status?: 'COMPLIANT' | 'NON_COMPLIANT' | 'PARTIAL_COMPLIANCE';
+  missing_elements?: any; // JSON array
+  legal_requirements?: any; // JSON array
+  key_findings?: any; // JSON array
+  recommendations?: any; // JSON array
+  document_metadata?: any; // JSON object
+  analysis_result?: any; // Complete analysis response JSON
+  processing_time?: number; // in milliseconds
+  verification_timestamp: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // Database service functions
 export class DatabaseService {
   // User management
@@ -222,6 +248,104 @@ export class DatabaseService {
       .eq('id', userId)
       .single();
     
+    if (error) throw error;
+    return data;
+  }
+
+  // Document Authenticity
+  static async saveDocumentAuthenticity(authenticity: {
+    user_id: string;
+    document_id: string;
+    file_name?: string;
+    file_type?: string;
+    file_size?: number;
+    authenticity_score: number;
+    confidence_score?: number;
+    risk_level: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+    is_authentic: boolean;
+    fraud_risk_score?: number;
+    fraud_indicators?: any;
+    compliance_status?: 'COMPLIANT' | 'NON_COMPLIANT' | 'PARTIAL_COMPLIANCE';
+    missing_elements?: any;
+    legal_requirements?: any;
+    key_findings?: any;
+    recommendations?: any;
+    document_metadata?: any;
+    analysis_result?: any;
+    processing_time?: number;
+  }) {
+    const { data, error } = await supabase
+      .from('document_authenticity')
+      .insert([{
+        ...authenticity,
+        confidence_score: authenticity.confidence_score || authenticity.authenticity_score,
+        fraud_risk_score: authenticity.fraud_risk_score || 0,
+        verification_timestamp: new Date().toISOString()
+      }])
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async getDocumentAuthenticityHistory(userId: string, limit: number = 10) {
+    const { data, error } = await supabase
+      .from('document_authenticity')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async getDocumentAuthenticityById(documentId: string) {
+    const { data, error } = await supabase
+      .from('document_authenticity')
+      .select('*')
+      .eq('document_id', documentId)
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateDocumentAuthenticity(id: string, updates: Partial<DocumentAuthenticity>) {
+    const { data, error } = await supabase
+      .from('document_authenticity')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteDocumentAuthenticity(id: string, userId: string) {
+    const { error } = await supabase
+      .from('document_authenticity')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+  }
+
+  // Analytics for document authenticity
+  static async getAuthenticityAnalytics(userId: string, days: number = 30) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const { data, error } = await supabase
+      .from('document_authenticity')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('created_at', startDate.toISOString())
+      .order('created_at', { ascending: true });
+
     if (error) throw error;
     return data;
   }

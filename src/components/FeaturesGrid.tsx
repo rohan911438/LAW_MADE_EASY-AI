@@ -267,7 +267,14 @@ export const FeaturesGrid = () => {
                     <Play className="w-4 h-4 mr-2" />
                     Try Demo
                   </Button>
-                  {activeFeature === 1 ? (
+                  {activeFeature === 0 ? (
+                    <Link to="/document-authenticity" className="flex-1">
+                      <Button variant="outline" className="w-full">
+                        Try Now
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
+                  ) : activeFeature === 1 ? (
                     <Link to="/legal-simplifier" className="flex-1">
                       <Button variant="outline" className="w-full">
                         Try Now

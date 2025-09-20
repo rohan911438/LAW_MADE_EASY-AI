@@ -26,7 +26,7 @@ export const Navigation = () => {
       icon: FileCheck,
       title: "Document Checker",
       description: "Verify authenticity instantly",
-      href: "#features"
+      href: "/document-authenticity"
     },
     {
       icon: Bot,
