@@ -38,7 +38,7 @@ export const Navigation = () => {
       icon: Newspaper,
       title: "Legal News",
       description: "Stay updated with latest laws",
-      href: "#features"
+      href: "/legal-news-feed"
     },
     {
       icon: Users,

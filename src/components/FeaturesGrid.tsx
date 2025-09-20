@@ -84,7 +84,8 @@ export const FeaturesGrid = () => {
       subtitle: "Stay Updated with Latest Legal Changes",
       description: "Daily legal headlines from Supreme Court, Parliament, and Bar Council updates. Stay informed in one place.",
       image: legalNewsFeed,
-      statusColor: "warning",
+      status: "Live",
+      statusColor: "success",
       pricing: "₹499/month",
       accuracy: 100,
       avgTime: "Real-time",
@@ -278,6 +279,13 @@ export const FeaturesGrid = () => {
                     <Link to="/legal-simplifier" className="flex-1">
                       <Button variant="outline" className="w-full">
                         Try Now
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
+                  ) : activeFeature === 2 ? (
+                    <Link to="/legal-news-feed" className="flex-1">
+                      <Button variant="outline" className="w-full">
+                        View News Feed
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </Link>
