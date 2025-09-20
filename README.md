@@ -1,115 +1,162 @@
-# 📜 LawMadeEasy – AI Legal Platform
+# Law Made Easy AI
 
-> Making Law Simple, Accessible & Transparent with AI  
-> Trusted by 500+ legal professionals | 99.2% Accuracy | 10K+ Documents Analyzed
+Making law simple, accessible, and transparent with AI.
 
----
+- Live Demo: https://lovable.dev/projects/10e7faec-c75a-4a7b-a30d-9106e781095e
+- GitHub: https://github.com/rohan911438
 
-## 🌍 About LawMadeEasy
 
-LawMadeEasy is an AI-powered legal technology platform designed to democratize access to law by simplifying complex documents, verifying authenticity, and enabling collaboration within the legal community.  
+## Overview
 
-We make legal knowledge transparent, efficient, and accessible for:  
-- ⚖️ Law firms  
-- 🏢 Corporates  
-- 👨‍🎓 Students  
-- 👤 Individuals  
+Law Made Easy AI is a Vite + React + TypeScript web app that helps users:
+- Simplify complex legal documents into plain English
+- Check document authenticity with AI-assisted analysis and risk scoring
+- Stay updated with curated Indian legal news
+- Explore a social-style feed of legal professionals and posts (local-first demo)
 
-📌 Important Disclaimer  
-LawMadeEasy AI is for educational and accessibility purposes only. It does not provide binding legal advice. Always consult a qualified legal professional for formal guidance.  
+The app works in a “demo-first” mode with graceful fallbacks, and optionally connects to Supabase for authentication, history, and analytics.
 
----
 
-## 🚀 Key Features
+## Features
 
-- ✅ Document Authenticity Checker – AI-powered fraud detection, clause verification, and risk scoring.  
-- 📑 AI Legal Simplifier – Converts complex legal jargon into plain, understandable English.  
-- 📰 Indian Legal News Feed – Real-time updates on legal developments across India.  
-- 👥 Legal Community (Beta) – Network and collaborate with peers and experts.  
+- Legal Simplifier: Paste text or upload PDF/DOC/DOCX; get simplified, accurate summaries with key terms highlighted.
+- Document Authenticity: AI-powered analysis detecting fraud indicators, missing clauses, and compliance issues, with risk levels.
+- Legal News Feed: Category filters, tags, importance badges, and details modal; uses NewsAPI when a key is set, else mock data.
+- Legal Social Feed (Demo): Local-first profiles and posts with filters by specialization and tags.
+- Auth + History (Optional): Sign in with Supabase to save processed documents and revisit results.
+- Robust Parsing: PDF/DOC/DOCX parsing via `pdf-parse`, `pdfjs-dist`, `mammoth`, and drag-drop via `react-dropzone`.
 
----
 
-## 📊 Platform Highlights
+## Tech Stack
 
-- 🔐 100% Secure – AES-256 encryption & strict compliance with data protection laws.  
-- ⚡ Fast Analysis – Get results in <5 minutes with industry-leading accuracy.  
-- 📂 10K+ Documents Processed – Across industries and practice areas.  
-- 👨‍⚖️ Trusted by 500+ Legal Professionals – From solo practitioners to multinational firms.  
+- App: Vite, React 18, TypeScript, React Router, TanStack Query
+- UI: Tailwind CSS, shadcn/ui, Radix Primitives, lucide-react
+- Data/Backend: Supabase (Auth, DB), Axios
+- AI: Google Generative Language API (Gemini 1.5 Flash) for simplification and authenticity analysis
+- Utils: date-fns, react-hook-form, zod, react-dropzone, recharts
 
----
 
-## 💡 How It Works
+## Project Structure
 
-1. 📤 Upload Document – Drag & drop or browse your file.  
-2. 🤖 AI Analysis – Smart verification and simplification in seconds.  
-3. 📑 Get Results – Risk assessment, compliance insights, and plain-language summaries.  
-4. 📥 Download Report – Export in PDF/DOC/TXT with certifications.  
+```
+src/
+  pages/                 # Views: Index, LegalSimplifier, DocumentAuthenticity, LegalNewsFeed, LegalSocialFeed
+  components/            # UI and feature components (modals, filters, cards)
+  components/ui/         # shadcn/ui primitives
+  services/              # API services: legalSimplifierAPI, documentAuthenticityAPI, legalNewsAPI, legalSocialAPI, database
+  hooks/                 # Custom hooks
+  assets/                # Images used by pages
+  lib/                   # Utilities
+```
 
----
+Database schema for Supabase is provided in `database-schema.sql`.
 
-## 🏆 Success Stories
 
-> "LawMadeEasy transformed how we handle contract reviews. The AI caught critical issues that would have cost us millions. Our legal team now processes documents 10x faster."  
-— Priya Sharma, Senior Legal Counsel at TechCorp India  
+## Screenshots
 
-- ⏱️ 40+ hours saved weekly  
-- ⚡ 1000% faster processing  
-- 🏢 Industry: Technology  
+> Add or replace with your own screenshots.
 
----
+![Hero](src/assets/hero-legal-ai.jpg)
+![Document Analysis](src/assets/document-analysis.jpg)
+![Legal News Feed](src/assets/legal-news-feed.jpg)
 
-## 💳 Pricing Plans
 
-| Plan            | Price         | Features                                                                 |
-|-----------------|--------------|---------------------------------------------------------------------------|
-| **Starter**     | Free         | 5 docs/month verification, 3 docs/month simplification, basic news feed   |
-| **Professional**| ₹2,499/month | 50 docs verification, 30 docs simplification, premium feed, priority support |
-| **Enterprise**  | ₹9,999/month | Unlimited docs, custom alerts, VIP access, 24/7 support, dedicated manager |
+## Getting Started
 
-📌 30-Day Money Back Guarantee – Try risk-free.  
+Prerequisites:
+- Node.js 18+ and npm 9+
 
----
+Install and run locally:
 
-## 🌐 SDG (Sustainable Development Goals) Alignment
+```
+git clone https://github.com/rohan911438/law-made-easy-ai.git
+cd law-made-easy-ai
+npm install
+npm run dev
+```
 
-This project contributes to United Nations Sustainable Development Goals:  
+Build and preview production build:
 
-- ⚖️ SDG 16: Peace, Justice & Strong Institutions  
-  - Promotes transparency in legal processes.  
-  - Improves access to justice by making legal language simple and understandable.  
-  - Strengthens institutions with AI-driven compliance & fraud detection.  
+```
+npm run build
+npm run preview
+```
 
-- 🏭 SDG 9: Industry, Innovation & Infrastructure  
-  - Demonstrates how AI innovation streamlines professional services.  
-  - Encourages digital transformation in the legal sector.  
-  - Builds sustainable, resilient, and modern infrastructure for legal workflows.  
 
----
+## Environment Variables
 
-## 🛠️ Tech Stack
+The app can run without any keys (uses mock data where needed). To enable live APIs and your own backend, configure the following in a `.env` file at repo root:
 
-- AI/ML Models – Custom-trained on millions of legal documents.  
-- Backend – Secure cloud-based microservices.  
-- Frontend – Responsive web UI with modern frameworks.  
-- Security – AES-256 encryption, GDPR & Indian IT Act compliance.  
+```
+# News API (optional for live news)
+VITE_NEWS_API_KEY=your_newsapi_key
 
----
+# Recommended: move these to env and update services to read from env
+# VITE_GOOGLE_API_KEY=your_google_generative_language_api_key
+# VITE_SUPABASE_URL=your_supabase_url
+# VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-## 📬 Support & Contact
+Notes:
+- `src/services/legalNewsAPI.ts` already reads `VITE_NEWS_API_KEY`.
+- `src/services/legalSimplifierAPI.ts`, `src/services/documentAuthenticityAPI.ts`, and `src/services/database.ts` currently use inline demo keys/constants. For production, switch them to read from `import.meta.env` and never commit secrets.
 
-- 📞 Phone: +91 (800) 123-4567  
-- 📧 Email: support@lawmadeeasy.ai  
-- 💬 Live Chat: 9 AM – 6 PM IST  
-- 🌐 Website: LawMadeEasy.ai  
 
----
+## Database (Supabase)
 
-## ⚖️ Legal Notice
+The SQL for tables used by the app is in `database-schema.sql`. To set up:
+1. Create a new Supabase project.
+2. Open SQL editor and run the contents of `database-schema.sql`.
+3. In production, update `src/services/database.ts` to read `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from env.
+4. Optional: Configure Row Level Security (RLS) policies per your needs.
 
-LawMadeEasy AI provides technology tools to assist with legal document analysis and is not a substitute for professional legal advice. Our AI tools are designed to augment, not replace, human legal judgment.  
+Tracked entities include:
+- `users`, `document_processing`, `usage_tracking`, `billing_records`, `document_authenticity`
 
----
 
-✅ Join 2,500+ legal professionals today and make your legal practice faster, smarter, and transparent.  
+## Development Notes
 
-📌 "Making Law Simple, Accessible & Transparent with AI."
+- Routes: see `src/App.tsx` for path mapping.
+- Simplifier flow: `src/pages/LegalSimplifier.tsx` orchestrates parsing, progress UI, and calls `legalSimplifierAPI`.
+- Authenticity flow: `src/pages/DocumentAuthenticity.tsx` + `documentAuthenticityAPI` with staged progress and a structured AI JSON output.
+- News feed: `legalNewsAPI` fetches from NewsAPI when `VITE_NEWS_API_KEY` is present; otherwise uses curated mock items with filters and tags.
+- Social feed: `legalSocialAPI` seeds localStorage with demo professionals and posts.
+
+
+## Deployment
+
+- Live Demo: https://lovable.dev/projects/10e7faec-c75a-4a7b-a30d-9106e781095e
+
+Static hosting (Vercel/Netlify/Static Site):
+1. Build with `npm run build`.
+2. Deploy the `dist/` folder.
+3. Ensure environment variables are configured in your hosting provider if you enable live APIs.
+
+
+## Security & Compliance
+
+- Do not commit API keys or secrets. Prefer `VITE_*` env vars and server-side proxies for sensitive operations.
+- This application is for educational and accessibility purposes and does not provide legal advice. Always consult a qualified legal professional.
+
+
+## Roadmap
+
+- Move all keys to environment variables; add `.env.example`.
+- Server-side proxy for AI requests with rate-limiting.
+- Export reports (PDF) and shareable links.
+- More granular RLS policies and audit logs in Supabase.
+
+
+## Contributing
+
+Issues and PRs are welcome. If you plan a larger change, please open an issue first to discuss the approach.
+
+
+## Author
+
+- GitHub: @rohan911438
+
+
+## License
+
+No license specified. If you intend to open source, add a LICENSE file (e.g., MIT) and update this section.
