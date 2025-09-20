@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 import { 
   Scale, 
   Menu, 
@@ -31,7 +32,7 @@ export const Navigation = () => {
       icon: Bot,
       title: "AI Simplifier",
       description: "Convert legalese to plain English",
-      href: "#features"
+      href: "/legal-simplifier"
     },
     {
       icon: Newspaper,
@@ -80,21 +81,43 @@ export const Navigation = () => {
               <div className="absolute top-full left-0 mt-2 w-80 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <div className="p-4">
                   <div className="grid gap-3">
-                    {features.map((feature, index) => (
-                      <a
-                        key={index}
-                        href={feature.href}
-                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
-                      >
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                          <feature.icon className="w-4 h-4 text-primary" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-foreground">{feature.title}</h4>
-                          <p className="text-sm text-muted-foreground">{feature.description}</p>
-                        </div>
-                      </a>
-                    ))}
+                    {features.map((feature, index) => {
+                      const isExternalLink = feature.href.startsWith('#') || feature.href.startsWith('http');
+                      
+                      if (isExternalLink) {
+                        return (
+                          <a
+                            key={index}
+                            href={feature.href}
+                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                          >
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                              <feature.icon className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-foreground">{feature.title}</h4>
+                              <p className="text-sm text-muted-foreground">{feature.description}</p>
+                            </div>
+                          </a>
+                        );
+                      } else {
+                        return (
+                          <Link
+                            key={index}
+                            to={feature.href}
+                            className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                          >
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                              <feature.icon className="w-4 h-4 text-primary" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-foreground">{feature.title}</h4>
+                              <p className="text-sm text-muted-foreground">{feature.description}</p>
+                            </div>
+                          </Link>
+                        );
+                      }
+                    })}
                   </div>
                 </div>
               </div>

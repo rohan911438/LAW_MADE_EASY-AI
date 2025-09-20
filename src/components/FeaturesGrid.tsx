@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "react-router-dom";
 import { 
   FileCheck, 
   Bot, 
@@ -266,10 +267,19 @@ export const FeaturesGrid = () => {
                     <Play className="w-4 h-4 mr-2" />
                     Try Demo
                   </Button>
-                  <Button variant="outline">
-                    Learn More
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
+                  {activeFeature === 1 ? (
+                    <Link to="/legal-simplifier" className="flex-1">
+                      <Button variant="outline" className="w-full">
+                        Try Now
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button variant="outline">
+                      Learn More
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  )}
                 </div>
               </div>
 

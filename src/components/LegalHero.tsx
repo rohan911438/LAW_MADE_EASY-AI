@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 import { 
   Scale, 
   FileCheck, 
@@ -94,11 +95,13 @@ export const LegalHero = () => {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Button variant="hero" size="lg" className="group relative overflow-hidden">
-            <span className="relative z-10">Start Free Analysis</span>
-            <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-            <div className="absolute inset-0 bg-accent/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-          </Button>
+          <Link to="/legal-simplifier">
+            <Button variant="hero" size="lg" className="group relative overflow-hidden">
+              <span className="relative z-10">Try AI Simplifier Free</span>
+              <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+              <div className="absolute inset-0 bg-accent/20 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+            </Button>
+          </Link>
           <Button 
             variant="heroSecondary" 
             size="lg" 
