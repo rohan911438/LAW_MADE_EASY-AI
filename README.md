@@ -1,4 +1,5 @@
-# Law Made Easy AI
+git remote set-url origin https://github.com/rohan911438/LAW_MADE_EASY-AI.git
+git remote -v# Law Made Easy AI
 
 Making law simple, accessible, and transparent with AI.
 
